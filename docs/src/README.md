@@ -3,10 +3,11 @@ home: true
 layout: BlogHome
 icon: house
 title: 博客主页
-heroImage: https://theme-hope-assets.vuejs.press/logo.svg
-heroText: 你博客的名称
+heroImage: 
+heroText: 我和梨梨~
 heroFullScreen: true
-tagline: 你可以在这里放置你的口号与标语
+tagline: 
+bgImage: public/images/bgImage.jpg
 projects:
   - icon: folder-open
     name: 项目名称
