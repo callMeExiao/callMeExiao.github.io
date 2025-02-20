@@ -37,7 +37,6 @@ jobs:
         env:
           NODE_OPTIONS: --max_old_space_size=8192
         run: |-
-          cd docs
           npm run docs:build
           > src/.vuepress/dist/.nojekyll
 
@@ -46,4 +45,4 @@ jobs:
         with:
           # 部署文档
           branch: gh-pages
-          folder: docs/src/.vuepress/dist
+          folder: src/.vuepress/dist
