@@ -18,5 +18,5 @@ config:
         -
           theme: alt
           text: Github →
-          link: https://github.com/callMeExiao
+          link: https://github.com/callMeExiao/callMeExiao.github.io
 ---
