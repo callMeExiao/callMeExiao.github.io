@@ -3,7 +3,7 @@ import { defineUserConfig } from 'vuepress'
 import { plumeTheme } from 'vuepress-theme-plume'
 
 export default defineUserConfig({
-  base: '/callMeExiao.github.io/',
+  base: '/',
   lang: 'zh-CN',
   title: 'Exiao\'s Blog',
   description: '',
