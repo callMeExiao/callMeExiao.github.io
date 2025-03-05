@@ -28,10 +28,10 @@ export default defineThemeConfig({
   // createTime: true, // 是否显示文章创建时间
 
   /* 站点页脚 */
-  // footer: {
-  //   message: 'Power by <a target="_blank" href="https://v2.vuepress.vuejs.org/">VuePress</a> & <a target="_blank" href="https://theme-plume.vuejs.press">vuepress-theme-plume</a>',
-  //   copyright: '',
-  // },
+  footer: {
+    message: '————————到底啦!————————',
+    copyright: 'copyleft © 2025 Exiao',
+  },
 
   /**
    * @see https://theme-plume.vuejs.press/config/basic/#profile
