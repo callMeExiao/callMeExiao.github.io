@@ -8,7 +8,7 @@ import { notes } from './notes'
 export default defineThemeConfig({
   logo: 'https://theme-plume.vuejs.press/plume.png',
 
-  appearance: true,  // 配置 深色模式
+  appearance: false,  // 配置 深色模式
 
   social: [
     { icon: 'github', link: 'https://github.com/callMeExiao/callMeExiao.github.io' },

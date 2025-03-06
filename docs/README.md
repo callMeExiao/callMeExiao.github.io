@@ -9,7 +9,7 @@ config:
     hero:
       name: Exiao's Blog
       tagline: 🦁🥥🌻
-      text: 欢迎来到霄霄的博客~咦呼~
+      text: 欢迎来到霄霄的博客~呀呼~
       actions:
         -
           theme: brand
