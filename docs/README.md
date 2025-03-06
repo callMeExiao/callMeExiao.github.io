@@ -25,7 +25,7 @@ config:
 
 <ArtPlayer
 src="/videos/demo.mp4"
-fullscreen
+:fullscreenWeb=true
 :volume=0.1
 :autoplay=true
 />
