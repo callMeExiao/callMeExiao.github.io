@@ -2,8 +2,7 @@
 pageLayout: home
 externalLinkIcon: false
 config:
-  -
-    type: hero
+  - type: hero
     full: true
     background: tint-plate
     hero:
@@ -11,12 +10,22 @@ config:
       tagline: 🦁🥥🌻
       text: 欢迎来到霄霄的博客~呀呼~
       actions:
-        -
-          theme: brand
+        - theme: brand
           text: 博客
           link: /blog/
-        -
-          theme: alt
+        - theme: alt
+          text: 点击看粉红猪小妹 ↓
+          link: https://github.com/callMeExiao/callMeExiao.github.io
+        - theme: alt
           text: Github →
           link: https://github.com/callMeExiao/callMeExiao.github.io
+  # 新增视频模块
+  - type: custom
 ---
+
+<ArtPlayer
+src="/videos/demo.mp4"
+fullscreen
+:volume=0.1
+:autoplay=true
+/>

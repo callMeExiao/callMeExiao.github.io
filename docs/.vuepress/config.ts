@@ -109,7 +109,8 @@ export default defineUserConfig({
        *  markdown power
        * @see https://theme-plume.vuejs.press/config/plugin/markdown-power/
        */
-      // markdownPower: {
+      markdownPower: {
+        artPlayer: true,    // 启用嵌入 artPlayer 本地视频 语法 @[artPlayer](url)
       //   abbr: true,         // 启用 abbr 语法  *[label]: content
       //   annotation: true,   // 启用 annotation 语法  [+label]: content
       //   pdf: true,          // 启用 PDF 嵌入 @[pdf](/xxx.pdf)
@@ -117,7 +118,6 @@ export default defineUserConfig({
       //   plot: true,         // 启用隐秘文本语法 !!xxxx!!
       //   bilibili: true,     // 启用嵌入 bilibili视频 语法 @[bilibili](bid)
       //   youtube: true,      // 启用嵌入 youtube视频 语法 @[youtube](video_id)
-      //   artPlayer: true,    // 启用嵌入 artPlayer 本地视频 语法 @[artPlayer](url)
       //   audioReader: true,  // 启用嵌入音频朗读功能 语法 @[audioReader](url)
       //   icons: true,        // 启用内置图标语法  :[icon-name]:
       //   codepen: true,      // 启用嵌入 codepen 语法 @[codepen](user/slash)
@@ -132,7 +132,7 @@ export default defineUserConfig({
       //     kotlin: true,     // ::: kotlin-repl
       //   },
       //   imageSize: 'local', // 启用 自动填充 图片宽高属性，避免页面抖动
-      // },
+      },
 
       /**
        * 为 Markdown 图像添加附加功能。
