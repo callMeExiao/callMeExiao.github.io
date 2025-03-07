@@ -78,12 +78,12 @@ const fetchBingImage = async () => {
     } else {
       console.error('获取必应图片失败')
       // 使用默认背景图
-      bannerStyle.value.backgroundImage = 'url(/images/default-home-banner.jpg)'
+      bannerStyle.value.backgroundImage = 'url(/images/defaultHomeBanner.jpg)'
     }
   } catch (error) {
     console.error('获取必应图片出错:', error)
     // 使用默认背景图
-    bannerStyle.value.backgroundImage = 'url(/images/default-home-banner.jpg)'
+    bannerStyle.value.backgroundImage = 'url(/images/defaultHomeBanner.jpg)'
   }
 }
 
