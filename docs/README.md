@@ -12,11 +12,11 @@ config:
       -
         title: 前端技术
         icon: 🎨
-        details: Vue + TypeScript
+        details: Vue3 + TypeScript
       -
         title: 后端技术
         icon: ⚙️
-        details: Java + SpringBoot
+        details: Java8 + SpringBoot2
       -
         title: 数据库
         icon: 🗄️
