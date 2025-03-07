@@ -17,6 +17,13 @@ const backgroundUrl = ref('')
 // 你的头像 URL，请替换为你的实际头像地址
 const avatarUrl = ref('/images/homeAvatar.jpg')
 
+// 判断是否为移动端
+const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+}
+
 // 背景样式
 const bannerStyle = ref({
   backgroundImage: 'none',
@@ -27,7 +34,12 @@ const bannerStyle = ref({
 // 获取必应每日图片
 const fetchBingImage = async () => {
   try {
-    const response = await fetch('https://dailybing.com/api/v1/today/zh-cn/UHD')
+    // 根据设备类型选择分辨率参数
+    const resolution = isMobile() ? 'MBL' : 'UHD'
+    const response = await fetch(
+      `https://dailybing.com/api/v1/today/zh-cn/${resolution}`
+    )
+
     if (response.ok) {
       backgroundUrl.value = response.url
       bannerStyle.value.backgroundImage = `url(${backgroundUrl.value})`
