@@ -31,9 +31,33 @@ const bannerStyle = ref({
   backgroundPosition: 'center'
 })
 
+// 获取当前日期字符串 (YYYY-MM-DD 格式)
+const getCurrentDate = () => {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+}
+
 // 获取必应每日图片
 const fetchBingImage = async () => {
   try {
+    // 检查本地存储中是否有缓存的图片
+    const cachedData = localStorage.getItem('bingDailyImage')
+    const currentDate = getCurrentDate()
+    
+    // 如果有缓存且是今天的图片，直接使用缓存
+    if (cachedData) {
+      const { date, imageUrl, deviceType } = JSON.parse(cachedData)
+      const currentDeviceType = isMobile() ? 'mobile' : 'desktop'
+      
+      if (date === currentDate && deviceType === currentDeviceType) {
+        console.log('使用缓存的必应每日图片')
+        backgroundUrl.value = imageUrl
+        bannerStyle.value.backgroundImage = `url(${imageUrl})`
+        return
+      }
+    }
+    
+    // 如果没有缓存或缓存过期，重新获取
     // 根据设备类型选择分辨率参数
     const resolution = isMobile() ? 'MBL' : 'UHD'
     const response = await fetch(
@@ -41,8 +65,16 @@ const fetchBingImage = async () => {
     )
 
     if (response.ok) {
-      backgroundUrl.value = response.url
-      bannerStyle.value.backgroundImage = `url(${backgroundUrl.value})`
+      const imageUrl = response.url
+      backgroundUrl.value = imageUrl
+      bannerStyle.value.backgroundImage = `url(${imageUrl})`
+      
+      // 将图片 URL 和日期保存到本地存储
+      localStorage.setItem('bingDailyImage', JSON.stringify({
+        date: currentDate,
+        imageUrl: imageUrl,
+        deviceType: isMobile() ? 'mobile' : 'desktop'
+      }))
     } else {
       console.error('获取必应图片失败')
       // 使用默认背景图
