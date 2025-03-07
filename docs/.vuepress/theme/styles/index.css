@@ -40,25 +40,25 @@
 
 .vp-doc h2 {
   font-family: var(--title-font);
-  color: rgb(208, 155, 76);
+  color: rgb(255, 177, 80);
   font-size: 1.8rem;
 }
 
 .vp-doc h3 {
   font-family: var(--title-font);
-  color: rgb(126, 66, 183);
+  color: rgb(158, 85, 239);
   font-size: 1.4rem;
 }
 
 .vp-doc h4 {
   font-family: var(--title-font);
-  color: rgb(75, 102, 189);
+  color: rgb(90, 121, 222);
   font-size: 1.4rem;
 }
 
 .vp-doc h5 {
   font-family: var(--title-font);
-  color: rgb(88, 175, 79);
+  color: rgb(102, 201, 91);
   font-size: 1.4rem;
 }
 
