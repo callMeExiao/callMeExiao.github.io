@@ -34,11 +34,26 @@ jobs:
       run: |
          git config --local user.email "574355578@qq.com"
          git config --local user.name "Exiao"
-         git pull --rebase  # 添加 rebase 避免合并提交
-         git add -A         # 简化添加所有变更文件
-         git commit -m "chore: auto update content"
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-         github_token: ${{ secrets.GITHUB_TOKEN }}
-         branch: main
+         
+         # Check if there are any changes to commit
+         if [[ -n "$(git status --porcelain)" ]]; then
+           # There are changes, commit them
+           git add -A
+           git commit -m "chore: auto update content"
+           
+           # Now pull with rebase
+           git pull --rebase
+           
+           # Push the changes
+           git push
+         else
+           # No changes, just pull
+           git pull --rebase
+         fi
+    
+    # Remove this step as we're now pushing in the commit step if needed
+    # - name: Push changes
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #      github_token: ${{ secrets.MY_GIT_TOKEN }}
+    #      branch: main
