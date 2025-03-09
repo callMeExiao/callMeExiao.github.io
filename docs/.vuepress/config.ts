@@ -58,13 +58,16 @@ export default defineUserConfig({
      * 为 markdown 文件自动添加 frontmatter 配置
      * @see https://theme-plume.vuejs.press/config/basic/#autofrontmatter
      */
-    // autoFrontmatter: {
-    //   permalink: true,  // 是否生成永久链接
-    //   createTime: true, // 是否生成创建时间
-    //   title: true,      // 是否生成标题
-    // },
+    autoFrontmatter: {
+      permalink: true,  // 是否生成永久链接
+      createTime: true, // 是否生成创建时间
+      title: true,      // 是否生成标题
+    },
 
     plugins: {
+      sitemap: {
+        hostname: 'https://callmeexiao.baby'
+      },
       /**
        * Shiki 代码高亮
        * @see https://theme-plume.vuejs.press/config/plugins/code-highlight/
@@ -138,12 +141,12 @@ export default defineUserConfig({
        * 为 Markdown 图像添加附加功能。
        * @see https://theme-plume.vuejs.press/config/plugins/markdown-image/
        */
-      // markdownImage: {
-      //   figure: true,       // 启用 figure
-      //   lazyload: true,     // 启用图片懒加载
-      //   mark: true,         // 启用图片标记
-      //   size: true,         // 启用图片大小
-      // },
+      markdownImage: {
+        figure: true,       // 启用 figure
+        lazyload: true,     // 启用图片懒加载
+        mark: true,         // 启用图片标记
+        size: true,         // 启用图片大小
+      },
 
       /**
        * 在 Markdown 文件中导入其他 markdown 文件内容。

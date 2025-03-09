@@ -4,7 +4,7 @@
       <div class="avatar-container">
         <img class="avatar" :src="avatarUrl" alt="Exiao's Avatar" />
       </div>
-      <h1 class="banner-text" style="font-size: 26px">🍐欢迎来到霄霄的博客~呀呼~</h1>
+      <h1 class="banner-text" style="font-size: 26px">🍐欢迎来到霄霄的技术博客~呀呼~</h1>
     </div>
   </div>
 </template>
