@@ -78,6 +78,7 @@ export default defineUserConfig({
                 twoslash: true, // 启用 twoslash
                 whitespace: true, // 启用 空格/Tab 高亮
                 lineNumbers: true, // 启用行号
+                theme: 'material-theme-ocean', // 主题
             },
 
             /* 本地搜索, 默认启用 */
