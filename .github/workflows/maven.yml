@@ -31,9 +31,9 @@ jobs:
       run: |
          git config --local user.email "574355578@qq.com"
          git config --local user.name "Exiao"
+         git add -A  # 简化添加所有变更文件
+         git commit -m "chore: 日常更新bing壁纸" || echo "没有新变更需要提交"
          git pull --rebase  # 添加 rebase 避免合并提交
-         git add -A         # 简化添加所有变更文件
-         git commit -m "chore: 日常更新bing壁纸"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
