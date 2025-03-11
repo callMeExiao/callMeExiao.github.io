@@ -1,41 +1,55 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: Update Bing Wallpaper
 
 on:
   push:
+    # 当 main 分支接收到推送时触发
     branches: [ main ]
   schedule:
-    # 每天凌晨0点执行
+    # 定时任务（UTC 时间每天 0 点，北京时间 8 点）
     - cron: '0 0 * * *'
 
 jobs:
   build:
-
+    # 使用最新版 Ubuntu 运行环境
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: current date
-      run: date
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
-    - name: Run Java Application
-      run: java -jar target/bing-wallpaper-jar-with-dependencies.jar
-    - name: Commit files
-      run: |
-         git config --local user.email "574355578@qq.com"
-         git config --local user.name "My Github Actions"
-         git add -A  # 简化添加所有变更文件
-         git commit -m "chore: 日常更新bing壁纸" || echo "没有新变更需要提交"
-         git pull --rebase  # 添加 rebase 避免合并提交
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-         github_token: ${{ secrets.GITHUB_TOKEN }}
-         branch: main
+      # 检出代码仓库
+      - uses: actions/checkout@v2
+      # 设置 JDK 8 环境
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      # 输出当前时间（用于日志记录）
+      - name: current date
+        run: date
+      # Maven 打包项目
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      # 运行 Java 程序生成壁纸
+      - name: Run Java Application
+        run: java -jar target/bing-wallpaper-jar-with-dependencies.jar
+      # 提交变更文件（壁纸图片）
+      - name: Commit files
+        run: |
+          git config --local user.email "574355578@qq.com"
+          git config --local user.name "My Github Actions"
+          git add -A  # 简化添加所有变更文件
+          git commit -m "chore: 日常更新bing壁纸" || echo "没有新变更需要提交"
+          git pull --rebase  # 添加 rebase 避免合并提交
+      # 推送变更到 main 分支
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          # github_token 是 GitHub Actions 自动生成的认证令牌，主要用于：
+          # 身份验证 - 允许工作流向仓库推送代码变更
+          # 权限控制 - 自动拥有当前仓库的读写权限（但仅限于当前仓库）
+          # 安全性 - 由 GitHub 自动生成和管理，无需手动配置敏感信息
+          # 在https://github.com/settings/tokens设置一个Personal access tokens (classic)
+          # 将这个token设置到仓库的settings/secrets/actions
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
