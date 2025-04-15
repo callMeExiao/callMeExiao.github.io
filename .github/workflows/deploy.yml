@@ -1,10 +1,16 @@
 name: deploy
 
 on:
+  # 添加 workflow_run 触发器
+  workflow_run:
+    workflows: [ "Update Bing Wallpaper" ]
+    branches: [ main ]
+    types:
+      - completed
   # 每当 push 到 main 分支时触发部署
   push:
-    branches: [main]
-    paths-ignore:  # 添加路径过滤
+    branches: [ main ]
+    paths-ignore: # 添加路径过滤
       - 'docs/壁纸/**'
       - 'target/**'
   # 手动触发部署

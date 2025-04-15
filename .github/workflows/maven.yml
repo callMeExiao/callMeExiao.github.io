@@ -51,7 +51,7 @@ jobs:
           # 安全性 - 由 GitHub 自动生成和管理，无需手动配置敏感信息
           # 在https://github.com/settings/tokens设置一个Personal access tokens (classic)
           # 将这个token设置到仓库的settings/secrets/actions
-          github_token: ${{ secrets.BLOG_ACTION_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
           force: true
           tags: false
