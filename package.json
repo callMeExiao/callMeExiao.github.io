@@ -26,6 +26,7 @@
     "vuepress-theme-plume": "1.0.0-rc.135"
   },
   "dependencies": {
-    "artplayer": "^5.2.2"
+    "artplayer": "^5.2.2",
+    "npx": "^10.2.2"
   }
 }
