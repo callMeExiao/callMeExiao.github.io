@@ -1,6 +1,7 @@
 import { defineClientConfig } from 'vuepress/client'
 import './theme/styles/index.css'
 import HomeBanner from './client/components/HomeBanner.vue'
+import Timeline from './client/components/Timeline.vue'
 // import RepoCard from 'vuepress-theme-plume/features/RepoCard.vue'
 // import NpmBadge from 'vuepress-theme-plume/features/NpmBadge.vue'
 // import NpmBadgeGroup from 'vuepress-theme-plume/features/NpmBadgeGroup.vue'
@@ -13,6 +14,7 @@ import HomeBanner from './client/components/HomeBanner.vue'
 export default defineClientConfig({
   enhance({ app }) {
     app.component('HomeBanner', HomeBanner)
+    app.component('Timeline', Timeline)
     // built-in components
     // app.component('RepoCard', RepoCard)
     // app.component('NpmBadge', NpmBadge)
