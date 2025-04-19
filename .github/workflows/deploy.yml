@@ -21,13 +21,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install WebP tools
-        run: sudo apt-get update && sudo apt-get install -y webp
-
-      - name: Convert images to WebP
-        run: |
-          find docs/壁纸 -type f -name "*.jpg" -exec sh -c 'cwebp -q 80 "$0" -o "${0%.jpg}.webp"' {} \;
-          find docs/壁纸 -type f -name "*.jpg" -exec rm {} \;
 
       - uses: actions/checkout@v4
         with:
@@ -41,6 +34,14 @@ jobs:
           version: 8
           # 使用 pnpm 安装依赖
           run_install: true
+
+      - name: Install WebP tools
+        run: sudo apt-get update && sudo apt-get install -y webp
+
+      - name: Convert images to WebP
+        run: |
+          find docs/.vuepress/public/images -type f -name "*.jpg" -exec sh -c 'cwebp -q 80 "$1" -o "${1%.jpg}.webp"' _ {} \;
+          find docs/.vuepress/public/images -type f -name "*.jpg" -exec rm {} \;
 
       # 运行构建脚本
       - name: Build VuePress site
