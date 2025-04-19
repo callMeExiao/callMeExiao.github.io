@@ -37,7 +37,7 @@ export default defineThemeConfig({
    * @see https://theme-plume.vuejs.press/config/basic/#profile
    */
   profile: {
-    avatar: '/images/profileAvatar.jpg',
+    avatar: '/images/profileAvatar.webp',
     name: 'Exiao',
     location: '杭州',
     description: '',
