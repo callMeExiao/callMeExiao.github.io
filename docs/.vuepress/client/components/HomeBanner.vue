@@ -15,7 +15,7 @@ import { ref, onMounted } from 'vue'
 // 背景图片 URL
 const backgroundUrl = ref('')
 // 你的头像 URL，请替换为你的实际头像地址
-const avatarUrl = ref('/images/homeAvatar.jpg')
+const avatarUrl = ref('/images/homeAvatar.webp')
 
 // 判断是否为移动端
 const isMobile = () => {
@@ -41,7 +41,7 @@ const useBingWallpaper = () => {
   } catch (error) {
     console.error('加载本地壁纸出错:', error)
     // 使用默认背景图
-    bannerStyle.value.backgroundImage = 'url(/images/defaultHomeBanner.jpg)'
+    bannerStyle.value.backgroundImage = 'url(/images/defaultHomeBanner.webp)'
   }
 }
 
