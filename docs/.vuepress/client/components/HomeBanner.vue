@@ -35,7 +35,7 @@ const bannerStyle = ref({
 const useBingWallpaper = () => {
   try {
     // 直接使用本地壁纸路径
-    const imageUrl = '/images/bingWallpaper.jpg'
+    const imageUrl = '/images/bingWallpaper.webp'
     backgroundUrl.value = imageUrl
     bannerStyle.value.backgroundImage = `url(${imageUrl})`
   } catch (error) {
