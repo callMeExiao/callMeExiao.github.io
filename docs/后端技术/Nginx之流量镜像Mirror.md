@@ -1,5 +1,5 @@
 ---
-title: Nginx
+title: Nginx之流量镜像Mirror
 createTime: 2025/04/22 20:14:37
 permalink: /article/m55hg40w/
 ---
