@@ -4,7 +4,6 @@ createTime: 2025/04/22 20:14:37
 permalink: /article/m55hg40w/
 ---
 
-# Nginx 在 Linux 环境中的应用
 
 ## 流量镜像Mirror
 
