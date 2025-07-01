@@ -339,7 +339,7 @@ Redis 5.0 的数据结构优化已基本成熟。它们不仅提供了丰富的�
 
 #### 原理
 
-1. 触发时机： 手动（SAVE/BGSAVE）或自动（配置文件 save <seconds> <changes>）。
+1. 触发时机： 手动（SAVE/BGSAVE）或自动（配置文件 save seconds changes）。
 2. 核心操作 BGSAVE：
     - 主线程 fork() 创建子进程（拥有与父进程相同的内存数据视图）。
     - 子进程将内存数据序列化为二进制格式写入临时 RDB 文件（.rdb）。
