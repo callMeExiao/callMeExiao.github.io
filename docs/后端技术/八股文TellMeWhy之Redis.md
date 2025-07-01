@@ -1,5 +1,5 @@
 ---
-title: 八股文TellMeWhy之Redis
+title: 八股文TellMeWhy之Redis5.0
 createTime: 2025/06/21 19:20:25
 permalink: /article/anoo9ub2/
 ---
