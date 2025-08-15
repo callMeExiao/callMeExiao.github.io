@@ -68,7 +68,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 #### 关键指令
 
 - FROM：指定基础镜像。你的构建将基于这个镜像进行。
-    - 语法：
+    - 语法：FROM [--platform=<platform>] <image>[:<tag>] [AS <name>]
     - 最佳实践：
         - 总是指定明确的镜像标签（:后部分），避免使用默认的latest标签（它可能会意外更新），以确保构建的可重复性。例如：FROM
           python:3.11-slim-bullseye。
@@ -85,8 +85,8 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - COPY&ADD：将本地文件或目录从构建上下文复制到镜像内。
     - 语法：
     - 区别：
-        - COPY： 推荐优先使用！功能纯粹：复制本地文件 / 目录。语法更清晰。
-        - ADD： 功能更多但更复杂：
+        - COPY：推荐优先使用！功能纯粹：复制本地文件 / 目录。语法更清晰。
+        - ADD：功能更多但更复杂：
             - 可以自动解压缩本地 src 中的 tar 归档文件。
             - 可以从 URL 下载并复制文件到镜像（但强烈不建议从 URL 直接下载，因为这会破坏构建缓存、需要网络且可能不稳定，应使用RUN
               curl/wget下载并清理）。
@@ -120,7 +120,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - ENTRYPOINT&CMD：定义容器启动时运行的默认命令。它们协同工作，但优先级和用途略有不同。
 
   | 指令             | 作用                                                     | 是否可被覆盖                                  | 推荐用法                                                                                          |
-          |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
+  |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
   | **ENTRYPOINT** | 指定容器启动时运行的主命令或可执行文件。它就像是命令的固定前缀部分。定义镜像的核心功能。	          | 在docker run时可通过--entrypoint覆盖，但这较少见且不推荐 | ENTRYPOINT ["executable", "param1", "param2"] (exec 形式)                                       |
   | **CMD**        | 指定主命令 (ENTRYPOINT) 的默认参数。为主命令 (ENTRYPOINT) 提供可变的默认参数。	 | docker run 后跟的任何内容会完全替代 CMD             | CMD ["param1", "param2"] (作为 ENTRYPOINT 的参数)CMD ["executable", "param1", "param2"] (单独使用时不推荐) |
 
@@ -182,6 +182,50 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - 确定性构建：避免在构建中引入外部动态变量（版本需固定）。
 - 无状态化设计：持久化数据应通过 VOLUME 或外部存储卷管理。
 - 非特权运行：通过 USER 指令避免以 root 身份运行容器进程。
+
+#### 一个完整的 Node.js 示例
+
+```dockerfile
+# Stage 1: Build the application
+FROM node:18-bullseye-slim AS builder
+
+# Create app directory (WORKDIR also creates it)
+WORKDIR /usr/src/app
+
+# Install app build dependencies (package.json and lockfile first for better caching)
+COPY package*.json ./
+# Use npm ci for reproducible installs in CI environments, equivalent to npm install with lockfile
+RUN npm ci --only=production
+
+# Copy application source code
+COPY . .
+
+# Build the app (assuming you have a build script)
+RUN npm run build
+
+# Stage 2: Create the production image
+FROM node:18-bullseye-slim
+
+# Non-root user setup for better security
+RUN groupadd -r nodegroup && useradd -r -g nodegroup nodeuser
+RUN mkdir -p /home/node/app && chown -R nodeuser:nodegroup /home/node/app
+
+WORKDIR /home/node/app
+
+# Copy only necessary files from the builder stage
+COPY --chown=nodeuser:nodegroup --from=builder /usr/src/app/package*.json ./
+COPY --chown=nodeuser:nodegroup --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=nodeuser:nodegroup --from=builder /usr/src/app/build ./build
+
+# Switch to non-root user
+USER nodeuser
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Define the startup command (exec form)
+CMD ["node", "build/index.js"] # Adjust path to your main entry file
+```
 
 ### 镜像(Image)
 
