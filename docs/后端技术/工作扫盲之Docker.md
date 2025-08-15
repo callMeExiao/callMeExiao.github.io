@@ -68,7 +68,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 #### 关键指令
 
 - FROM：指定基础镜像。你的构建将基于这个镜像进行。
-    - 语法：FROM [--platform=<platform>] <image>[:<tag>] [AS <name>]
+    - 语法：FROM [--platform=\<platform>] \<image>[:\<tag>] [AS \<name>]
     - 最佳实践：
         - 总是指定明确的镜像标签（:后部分），避免使用默认的latest标签（它可能会意外更新），以确保构建的可重复性。例如：FROM
           python:3.11-slim-bullseye。
@@ -83,7 +83,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
         - 通常设置在应用程序代码存放的目录。
     - 示例：WORKDIR /app
 - COPY&ADD：将本地文件或目录从构建上下文复制到镜像内。
-    - 语法：COPY [--chown=<user>:<group>] <src>... <dest> 或 COPY [--chown=<user>:<group>] ["<src>", ... "<dest>"] （支持通配符 *）
+    - 语法：COPY [--chown=\<user>:\<group>] \<src>... \<dest> 或 COPY [--chown=\<user>:\<group>] ["\<src>", ... "\<dest>"] （支持通配符 *）
     - 区别：
         - COPY：推荐优先使用！功能纯粹：复制本地文件 / 目录。语法更清晰。
         - ADD：功能更多但更复杂：
@@ -114,7 +114,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
             && apt-get clean
         ```
 - EXPOSE：声明容器运行时监听的端口（仅为元数据，不实际开放端口，需通过 docker run -p 映射宿主端口）。
-    - 语法：EXPOSE <port> [<port>/<protocol>...]
+    - 语法：EXPOSE \<port> [\<port>/\<protocol>...]
     - 最佳实践：声明应用程序实际监听的端口，作为文档并方便使用者知道需要映射哪个端口。
     - 示例：EXPOSE 80/tcp 443/udp
 - ENTRYPOINT&CMD：定义容器启动时运行的默认命令。它们协同工作，但优先级和用途略有不同。
@@ -148,17 +148,17 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
           指定具名卷或主机目录挂载更为常用和可控。
     - 示例：VOLUME /var/lib/mysql
 - ENV：设置容器构建期与运行时的环境变量，以键值对形式持久化嵌入镜像。
-    - 语法：ENV <key>=<value> ...（支持一次设置多个）
+    - 语法：ENV \<key>=\<value> ...（支持一次设置多个）
     - 示例：ENV NODE_ENV=production APP_VERSION=1.0.0
 - ARG：声明仅构建阶段有效的临时变量，用于动态注入参数，不保留至运行时。
-    - 语法：ARG <varname>[=<default value>]
+    - 语法：ARG \<varname>[=\<default value>]
     - 示例：
         ```dockerfile
         ARG APP_VERSION=latest
         ENV APP_VERSION=$APP_VERSION # 如果需要运行时使用，可将其转存到 ENV
         ```
 - USER(用户切换)：指定后续指令以哪个用户（和可选的用户组）身份运行（RUN, CMD, ENTRYRYPOINT）。默认是 root。
-    - 语法：USER <user>[:<group>] 或 USER <UID>[:<GID>]
+    - 语法：USER \<user>[:\<group>] 或 USER \<UID>[:\<GID>]
     - 最佳实践：
         - 强烈建议创建非 root 用户并在后面切换到它运行应用程序，增强容器安全性（最小权限原则）。
         - 通常先在某个 RUN 指令中创建好用户和组（并设置合适的权限和目录所有权），再使用 USER。
