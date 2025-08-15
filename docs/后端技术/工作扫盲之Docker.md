@@ -83,7 +83,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
         - 通常设置在应用程序代码存放的目录。
     - 示例：WORKDIR /app
 - COPY&ADD：将本地文件或目录从构建上下文复制到镜像内。
-    - 语法：
+    - 语法：COPY [--chown=<user>:<group>] <src>... <dest> 或 COPY [--chown=<user>:<group>] ["<src>", ... "<dest>"] （支持通配符 *）
     - 区别：
         - COPY：推荐优先使用！功能纯粹：复制本地文件 / 目录。语法更清晰。
         - ADD：功能更多但更复杂：
@@ -96,7 +96,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
         - 避免使用 ADD 从 URL 下载文件。
         - 使用 --chown 设置复制文件的所有权（如果非默认用户）。
 - RUN：在构建镜像过程中执行命令。通常是安装软件包、编译代码、运行脚本等。
-    - 语法：
+    - 语法：RUN (shell 形式) 或 RUN ["executable", "param1", "param2"] (exec 形式)
     - 最佳实践：
         - 尽量将相关操作合并成一个RUN指令（使用 && 连接命令，\ 换行），避免创建过多不必要的中间层。
         - 清理安装缓存 (apt-get clean, rm -rf /var/lib/apt/lists/*, yum clean all, npm cache clean --force 等) 在同一个
@@ -114,7 +114,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
             && apt-get clean
         ```
 - EXPOSE：声明容器运行时监听的端口（仅为元数据，不实际开放端口，需通过 docker run -p 映射宿主端口）。
-    - 语法：
+    - 语法：EXPOSE <port> [<port>/<protocol>...]
     - 最佳实践：声明应用程序实际监听的端口，作为文档并方便使用者知道需要映射哪个端口。
     - 示例：EXPOSE 80/tcp 443/udp
 - ENTRYPOINT&CMD：定义容器启动时运行的默认命令。它们协同工作，但优先级和用途略有不同。
@@ -141,24 +141,24 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
           形式 (ENTRYPOINT executable param1) 导致子进程无法正常接收信号的问题。
         - 理解二者关系：CMD 提供 ENTRYPOINT 的默认参数。
 - VOLUME：创建一个具有指定路径的匿名卷挂载点。当容器启动时，Docker 会自动创建一个匿名卷并挂载到该路径。即使以后容器被删除，该匿名卷也会留存。
-    - 语法：
+    - 语法：VOLUME ["/data"] 或 VOLUME /data /more/data （多个路径）
     - 最佳实践：
         - 用于标记需要持久化数据的目录（如数据库文件、日志文件）。
         - 主要作为镜像提供者的建议，告诉用户该目录的数据应该被持久化。通常在实际运行容器时，使用 -v 或 --mount
           指定具名卷或主机目录挂载更为常用和可控。
     - 示例：VOLUME /var/lib/mysql
 - ENV：设置容器构建期与运行时的环境变量，以键值对形式持久化嵌入镜像。
-    - 语法：
+    - 语法：ENV <key>=<value> ...（支持一次设置多个）
     - 示例：ENV NODE_ENV=production APP_VERSION=1.0.0
 - ARG：声明仅构建阶段有效的临时变量，用于动态注入参数，不保留至运行时。
-    - 语法：
+    - 语法：ARG <varname>[=<default value>]
     - 示例：
         ```dockerfile
         ARG APP_VERSION=latest
         ENV APP_VERSION=$APP_VERSION # 如果需要运行时使用，可将其转存到 ENV
         ```
 - USER(用户切换)：指定后续指令以哪个用户（和可选的用户组）身份运行（RUN, CMD, ENTRYRYPOINT）。默认是 root。
-    - 语法：
+    - 语法：USER <user>[:<group>] 或 USER <UID>[:<GID>]
     - 最佳实践：
         - 强烈建议创建非 root 用户并在后面切换到它运行应用程序，增强容器安全性（最小权限原则）。
         - 通常先在某个 RUN 指令中创建好用户和组（并设置合适的权限和目录所有权），再使用 USER。
