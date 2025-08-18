@@ -83,7 +83,8 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
         - 通常设置在应用程序代码存放的目录。
     - 示例：WORKDIR /app
 - COPY&ADD：将本地文件或目录从构建上下文复制到镜像内。
-    - 语法：COPY [--chown=\<user>:\<group>] \<src>... \<dest> 或 COPY [--chown=\<user>:\<group>] ["\<src>", ... "\<dest>"] （支持通配符 *）
+    - 语法：COPY [--chown=\<user>:\<group>] \<src>... \<dest> 或
+      COPY [--chown=\<user>:\<group>] ["\<src>", ... "\<dest>"] （支持通配符 *）
     - 区别：
         - COPY：推荐优先使用！功能纯粹：复制本地文件 / 目录。语法更清晰。
         - ADD：功能更多但更复杂：
@@ -120,7 +121,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - ENTRYPOINT&CMD：定义容器启动时运行的默认命令。它们协同工作，但优先级和用途略有不同。
 
   | 指令             | 作用                                                     | 是否可被覆盖                                  | 推荐用法                                                                                          |
-  |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
+                            |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
   | **ENTRYPOINT** | 指定容器启动时运行的主命令或可执行文件。它就像是命令的固定前缀部分。定义镜像的核心功能。	          | 在docker run时可通过--entrypoint覆盖，但这较少见且不推荐 | ENTRYPOINT ["executable", "param1", "param2"] (exec 形式)                                       |
   | **CMD**        | 指定主命令 (ENTRYPOINT) 的默认参数。为主命令 (ENTRYPOINT) 提供可变的默认参数。	 | docker run 后跟的任何内容会完全替代 CMD             | CMD ["param1", "param2"] (作为 ENTRYPOINT 的参数)CMD ["executable", "param1", "param2"] (单独使用时不推荐) |
 
@@ -183,7 +184,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - 无状态化设计：持久化数据应通过 VOLUME 或外部存储卷管理。
 - 非特权运行：通过 USER 指令避免以 root 身份运行容器进程。
 
-#### 一个完整的 Node.js 示例
+#### 示例（Node.js 应用）
 
 ```dockerfile
 # Stage 1: Build the application
@@ -226,6 +227,80 @@ EXPOSE 3000
 # Define the startup command (exec form)
 CMD ["node", "build/index.js"] # Adjust path to your main entry file
 ```
+
+#### 高级指令&技巧
+
+- HEALTHCHECK(容器健康检查)：定义容器健康状态检查策略，Docker 引擎会定期执行指定命令检测容器内主进程的健康状态。
+    - 作用：
+        - 为编排系统（如 Kubernetes/Docker Swarm）提供健康状态信息
+        - 支持自动重启不健康的容器
+        - docker ps 命令可显示健康状态（healthy, unhealthy, starting）
+    - 语法：HEALTHCHECK [OPTIONS] CMD \<command\>
+    - 关键参数：
+        - --interval=DURATION (默认 30s)：检查间隔时间
+        - --timeout=DURATION (默认 30s)：命令超时时间
+        - --start-period=DURATION (默认 0s)：容器启动后的初始化宽限期（此期间失败不计为不健康）
+        - --retries=N (默认 3)：连续失败 N 次后标记为不健康
+        - CMD：执行检查的命令（必须返回退出码：0 - 健康，1 - 不健康）
+    - 示例：
+        ```dockerfile
+        # 检查Web服务端口是否响应
+        HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+        CMD curl -f http://localhost:3000/healthz || exit 1
+
+        # 检查特定进程是否运行
+        HEALTHCHECK CMD pgrep -f "node app.js" > /dev/null || exit 1
+
+        # 自定义脚本检查复杂状态
+        HEALTHCHECK CMD /usr/local/bin/healthcheck.sh
+        ```
+    - 最佳实践
+        - 所有生产环境关键服务都应配置健康检查
+        - 检查接口应轻量快速，避免消耗过多资源
+        - 在 start-period 中考虑应用初始化时间
+        - curl 使用 -f / --fail 选项确保 HTTP 错误状态会返回非零退出码
+        - 避免检查过于频繁（间隔至少 10s）
+- 多阶段构建：分离构建环境和运行环境，大幅减小最终镜像体积，提升安全性。
+    - 工作原理
+        - 利用多个 FROM 指令定义多个构建阶段
+        - 每个阶段有独立的环境和上下文
+        - 后续阶段可从前驱阶段复制构建产物（如编译好的二进制文件）
+        - 仅最终阶段的内容会出现在输出镜像中
+    - 示例（Node.js 应用）
+        ```dockerfile
+        # -------------------- 阶段 1: 构建应用 --------------------
+        FROM node:18 AS builder
+        # 创建工作目录并安装依赖
+        WORKDIR /app
+        COPY package*.json ./
+        RUN npm ci --only=production # 精确安装生产依赖
+        # 复制源码并构建
+        COPY . .
+        RUN npm run build
+        # -------------------- 阶段 2: 运行环境 --------------------
+        FROM node:18-slim
+        # 创建非root用户
+        RUN groupadd -r appuser && useradd -r -g appuser appuser
+        WORKDIR /home/appuser
+        RUN chown -R appuser:appuser /home/appuser
+        # 从构建阶段复制产物
+        COPY --chown=appuser:appuser --from=builder /app/node_modules ./node_modules
+        COPY --chown=appuser:appuser --from=builder /app/dist ./dist
+        # 使用非root用户
+        USER appuser
+        # 暴露端口和启动命令
+        EXPOSE 8080
+        CMD ["node", "dist/server.js"]
+        ```
+    - 作用
+      - 极简镜像：最终镜像只包含运行必备的二进制文件和依赖，没有庞大的开发工具链，构建中间文件等
+      - 增强安全： 攻击面显著减小
+      - 提升效率： 更小的镜像意味着更快的拉取&推送速度，更少的磁盘占用，更快的容器启动
+    - 最佳实践
+      - 命名阶段： 通过 FROM image AS stage-name 命名阶段，方便跨阶段复制
+      - 仅复制必要文件： 精确控制从哪个阶段复制哪些文件（COPY --from=stage-name /path)
+      - 共享构建缓存： 在 CI/CD 中可复用前阶段构建缓存加速后续构建
+      - 多架构构建： 结合 Buildx 可构建多平台镜像
 
 ### 镜像(Image)
 
