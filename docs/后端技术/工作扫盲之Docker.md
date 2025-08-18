@@ -401,7 +401,7 @@ CMD ["node", "build/index.js"] # Adjust path to your main entry file
     - 最佳实践
         - 优先让应用响应标准的 SIGTERM 信号
         - 仅在应用有特殊关闭需求时才配置 STOPSIGNAL
-        - 结合 docker stop -t <seconds> 调整超时时间
+        - 结合 docker stop -t \<seconds> 调整超时时间
         - 避免直接使用 SIGKILL： 它不会给应用任何清理机会，可能导致数据损坏。
 - LABEL(组织镜像元数据)：向镜像添加键值对形式的元数据‘
     - 用途
