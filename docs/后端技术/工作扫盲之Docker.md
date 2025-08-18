@@ -121,7 +121,7 @@ Dockerfile 是指令集合，描述了如何从头开始构建一个可运行的
 - ENTRYPOINT&CMD：定义容器启动时运行的默认命令。它们协同工作，但优先级和用途略有不同。
 
   | 指令             | 作用                                                     | 是否可被覆盖                                  | 推荐用法                                                                                          |
-                            |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
+                                                              |----------------|--------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------|
   | **ENTRYPOINT** | 指定容器启动时运行的主命令或可执行文件。它就像是命令的固定前缀部分。定义镜像的核心功能。	          | 在docker run时可通过--entrypoint覆盖，但这较少见且不推荐 | ENTRYPOINT ["executable", "param1", "param2"] (exec 形式)                                       |
   | **CMD**        | 指定主命令 (ENTRYPOINT) 的默认参数。为主命令 (ENTRYPOINT) 提供可变的默认参数。	 | docker run 后跟的任何内容会完全替代 CMD             | CMD ["param1", "param2"] (作为 ENTRYPOINT 的参数)CMD ["executable", "param1", "param2"] (单独使用时不推荐) |
 
@@ -235,7 +235,7 @@ CMD ["node", "build/index.js"] # Adjust path to your main entry file
         - 为编排系统（如 Kubernetes/Docker Swarm）提供健康状态信息
         - 支持自动重启不健康的容器
         - docker ps 命令可显示健康状态（healthy, unhealthy, starting）
-    - 语法：HEALTHCHECK [OPTIONS] CMD \<command\>
+    - 语法：HEALTHCHECK [OPTIONS] CMD \<command>
     - 关键参数：
         - --interval=DURATION (默认 30s)：检查间隔时间
         - --timeout=DURATION (默认 30s)：命令超时时间
@@ -293,14 +293,171 @@ CMD ["node", "build/index.js"] # Adjust path to your main entry file
         CMD ["node", "dist/server.js"]
         ```
     - 作用
-      - 极简镜像：最终镜像只包含运行必备的二进制文件和依赖，没有庞大的开发工具链，构建中间文件等
-      - 增强安全： 攻击面显著减小
-      - 提升效率： 更小的镜像意味着更快的拉取&推送速度，更少的磁盘占用，更快的容器启动
+        - 极简镜像：最终镜像只包含运行必备的二进制文件和依赖，没有庞大的开发工具链，构建中间文件等
+        - 增强安全： 攻击面显著减小
+        - 提升效率： 更小的镜像意味着更快的拉取&推送速度，更少的磁盘占用，更快的容器启动
     - 最佳实践
-      - 命名阶段： 通过 FROM image AS stage-name 命名阶段，方便跨阶段复制
-      - 仅复制必要文件： 精确控制从哪个阶段复制哪些文件（COPY --from=stage-name /path)
-      - 共享构建缓存： 在 CI/CD 中可复用前阶段构建缓存加速后续构建
-      - 多架构构建： 结合 Buildx 可构建多平台镜像
+        - 命名阶段： 通过 FROM image AS stage-name 命名阶段，方便跨阶段复制
+        - 仅复制必要文件： 精确控制从哪个阶段复制哪些文件（COPY --from=stage-name /path)
+        - 共享构建缓存： 在 CI/CD 中可复用前阶段构建缓存加速后续构建
+        - 多架构构建： 结合 Buildx 可构建多平台镜像
+- .dockerignore
+    - 作用
+        - 构建速度： 减少发送到 Docker 守护进程的上下文数据量
+        - 构建缓存： 文件变更会影响缓存失效，忽略不需要的文件保持缓存稳定
+        - 安全性： 避免将敏感文件（.env, *.pem, id_rsa）意外打包进镜像
+        - 镜像大小： 防止大文件（.git, node_modules, 日志文件）被意外添加
+    - 匹配规则
+        - **/__pycache__：递归匹配所有层级的 __pycache__ 目录
+        - *.md：忽略所有 Markdown 文件
+        - !docs/README.md：特例排除（不忽略 docs/README.md）
+        - temp?：匹配 temp1, temp2 等（? = 单个字符）
+        - /vendor：仅忽略根目录的 vendor 目录（不忽略子目录的）
+    - 最佳实践
+        - 必须创建： 每个 Docker 项目都应该有 .dockerignore
+        - 全面过滤： 包含所有临时文件、日志、版本控制目录、依赖目录、IDE 配置
+        - 定期审查： 随着项目演进更新忽略规则
+        - 与构建分离： 构建需要的文件应显式复制，而不是依赖上下文
+    - 示例
+        ```text
+        # 忽略文件
+        # Dockerfile*
+        docker-compose*
+        .dockerignore
+        # 忽略目录
+        **/.git
+        **/.vscode
+        **/.idea
+        **/node_modules
+        **/vendor
+        **/__pycache__
+        **/dist
+        **/build
+        **/logs
+        **/.npm
+        # 忽略特定文件类型
+        *.log
+        *.tmp
+        *.bak
+        *.swp
+        *.env
+        *.secret
+        *.pem
+        *.key
+        *.cert
+        # 特例保留 (使用 !)
+        !config/production.env
+        ```
+- ARG 与构建时参数：在构建时 (docker build) 注入动态值
+    - 用法
+        - 环境变量贯通：将在构建时传入的 ARG 值转为运行时 ENV
+            ```dockerfile
+            ARG BUILD_TIME_API_URL
+            ENV RUNTIME_API_URL=$BUILD_TIME_API_URL # 传递到运行时环境
+            ```
+        - 设置基础镜像标签：在 FROM 指令中使用 ARG 定义基础镜像标签，实现动态切换
+            ```dockerfile
+            ARG BASE_IMAGE_TAG=alpine
+            FROM node:18-$BASE_IMAGE_TAG
+            ```
+        - 控制功能开关：通过 ARG 定义环境变量，控制应用行为
+            ```dockerfile
+            ARG ENABLE_DEBUG=false
+            RUN if [ "$ENABLE_DEBUG" = "true" ];  \
+                  npm install --save-dev debug; \
+                fi
+            ```
+        - 缓存破坏：ARG 定义的参数会影响缓存键，导致缓存失效
+            ```dockerfile
+            ARG CACHE_BUSTER
+            RUN echo "Cache buster: $CACHE_BUSTER" && \
+                npm install
+            ```
+          构建命令：docker build --build-arg CACHE_BUSTER=$(date +%s) ...
+        - 多阶段构建参数传递：在多阶段构建中，ARG 定义的参数可以在后续阶段中使用
+            ```dockerfile
+            ARG VERSION=latest
+            FROM builder AS build1
+            ARG VERSION # 重新声明以继承构建命令传入的值
+            RUN build-with-$VERSION
+            ```
+    - 注意事项：
+        - 安全警告： 不要用 ARG 传递密码、密钥等敏感信息！因为值会保留在镜像历史记录中（可使用 docker history 查看）。敏感信息请使用
+          Docker Secrets (BuildKit) 或外部挂载。
+        - 作用域： ARG 在定义它的构建阶段结束时就失效了。要在多个阶段使用同一个参数，需要在每个阶段重新定义 ARG。
+        - 构建参数默认值在声明时设置。
+- STOPSIGNAL(自定义停止信号)：指定容器停止时由 docker stop 发送给容器内部 PID 1 进程的信号
+    - 语法：STOPSIGNAL \<signal> # \<signal> 可以是信号名 (如 SIGTERM) 或信号编号 (如 9)。
+    - 使用场景
+        - 应用需要特定信号触发优雅关闭（如 SIGINT, SIGHUP）
+        - 调整默认的超时机制不适用时
+    - 示例
+      ```dockerfile
+      # 通知应用使用 SIGINT (Ctrl+C 的信号) 优雅停止
+      STOPSIGNAL SIGINT
+      # 强制快速关闭 (不推荐，应优先考虑优雅关闭)
+      STOPSIGNAL SIGKILL
+      ```
+    - 最佳实践
+        - 优先让应用响应标准的 SIGTERM 信号
+        - 仅在应用有特殊关闭需求时才配置 STOPSIGNAL
+        - 结合 docker stop -t <seconds> 调整超时时间
+        - 避免直接使用 SIGKILL： 它不会给应用任何清理机会，可能导致数据损坏。
+- LABEL(组织镜像元数据)：向镜像添加键值对形式的元数据‘
+    - 用途
+        - 记录维护者信息
+        - 标识软件版本、源码仓库
+        - 指定许可证信息
+        - 遵循 OCI 镜像规范 (opencontainers.org)
+        - 便于自动化工具管理 / 筛选镜像
+    - 语法：LABEL \<key>=\<value> \<key>=\<value> ...
+    - 示例
+      ```dockerfile
+      LABEL org.opencontainers.image.authors="devops@company.com"
+      LABEL org.opencontainers.image.description="High-performance web server"
+      LABEL org.opencontainers.image.version="v1.5.2"
+      LABEL org.opencontainers.image.source="https://github.com/company/webserver"
+      LABEL org.opencontainers.image.licenses="Apache-2.0"
+      LABEL com.company.component="auth-service"
+      LABEL maintainer="Engineering Team <eng@example.io>"
+      ```
+    - 最佳实践
+        - 使用有意义的命名空间（如 org.opencontainers.image.*, com.company.*)
+        - 提供有价值的描述信息和联系点
+        - 保持一致性，便于管理
+- ONBUILD(下游镜像触发器)：在当前镜像被用作另一个 Dockerfile 的 FROM 基础镜像时，自动在构建下游镜像时触发特定的指令
+    - 使用场景： 创建需要在构建新镜像时执行特定操作的基础镜像（常见于框架或语言基础镜像）。
+    - 语法：ONBUILD \<INSTRUCTION>
+    - 示例（创建一个 Node 应用基础镜像）
+      ```dockerfile
+      # Node 基础镜像 Dockerfile
+      FROM node:18-slim
+      # 安装一些全局需要的工具
+      RUN ...
+      # 定义触发指令
+      ONBUILD COPY package.json package-lock.json ./
+      ONBUILD RUN npm ci
+      ONBUILD COPY . .
+      # 定义默认命令
+      CMD ["npm", "start"]
+      ------------------------------------------------
+      # 当基于此镜像构建新项目镜像时：
+      FROM my-custom-node-base
+      # 此时会自动触发 ONBUILD 指令：
+      #   COPY package.json package-lock.json ./
+      #   RUN npm ci
+      #   COPY . .
+      ```
+    - 注意事项
+        - 使构建行为更隐晦（用户可能不了解 ONBUILD 做了什么）。文档务必清晰！
+        - 过度使用会使基础镜像不灵活。
+        - 在当今更推荐使用多阶段构建和清晰 Dockerfile 的趋势下，ONBUILD 的使用频率有所降低。
+        - 考虑替代方案：提供明确的构建脚本或模板 Dockerfile。
+    - 最佳实践
+        - 清晰文档： 在使用 ONBUILD 的基础镜像中明确说明触发了哪些操作。
+        - 谨慎使用： 只在操作逻辑紧密绑定于基础镜像目的时才使用（例如自动设置源文件结构）。
+        - 避免复杂逻辑： 保持 ONBUILD 指令简单直接（如 COPY, RUN 基本命令）。避免复杂的脚本或状态依赖。
+        - 替代方案优先： 考虑提供项目模板（Dockerfile.template）或脚手架工具是否更合适。
 
 ### 镜像(Image)
 
