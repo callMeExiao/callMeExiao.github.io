@@ -6,3 +6,24 @@ docs/.vuepress/dist
 
 .DS_Store
 *.log
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE / Editor
+.idea/
+*.iml
+.vscode/
+
+# Node build output
+dist/
+build/
+coverage/
+
+# Env files
+.env
+.env.*
