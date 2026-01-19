@@ -17,9 +17,9 @@ config:
       - title: 数据库
         icon: 🗄️
         details: MySQL + PostgreSQL
-      - title: 工具
-        icon: 🛠️
-        details: 各种工具网站
+      - title: BugFixLogs
+        icon: 🐛
+        details: Bug 修复日志
       - title: 网络知识
         icon: 🌐
         details: 网络相关的知识
