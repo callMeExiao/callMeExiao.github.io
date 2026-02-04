@@ -101,14 +101,7 @@ Paho 使用 `WebSocketSecureNetworkModule` → `SSLNetworkModule` 处理 WSS：
   - 由对方补齐证书链
   - 确保系统时间正确
 
-  ## 8. 脱敏日志示例
-
-  MQTT连接启动: broker=wss://<broker-host>:<port>/<path>, clientId=<client-id> ...
-  MQTT连接成功: broker=wss://<broker-host>:<port>/<path>, clientId=<client-id>, reconnect=false
-  MQTT订阅成功: clientId=<client-id>, detail=<detail>
-  MQTT连接失败: clientId=<client-id>, reason=<exception>
-
-  ## 9. 术语对照（技术简表）
+  ## 8. 术语对照（技术简表）
 
   - TLS: Transport Layer Security
   - SNI: Server Name Indication
