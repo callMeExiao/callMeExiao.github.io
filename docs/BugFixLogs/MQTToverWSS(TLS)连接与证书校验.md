@@ -5,7 +5,7 @@
 目标连接地址：
 
 
-wss://<broker-host>:<port>/<path>
+wss://<broker-host>:\<port>/\<path>
 
 
 协议栈自底向上：
