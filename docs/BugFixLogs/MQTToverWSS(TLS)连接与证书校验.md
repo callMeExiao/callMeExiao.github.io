@@ -1,18 +1,20 @@
+---
+title: MQTToverWSS(TLS)连接与证书校验
+createTime: 2026/02/04 09:55:46
+permalink: /article/5a8f6jl3/
+---
+
 # MQTT over WSS（TLS）连接与证书校验
 
 ## 1. 协议栈与连接阶段
 
 目标连接地址：
 
-
-wss://<broker-host>:\<port>/\<path>
-
+wss://\<broker-host>:\<port>/\<path>
 
 协议栈自底向上：
 
-
 TCP -> TLS -> HTTP Upgrade -> WebSocket -> MQTT
-
 
 典型阶段：
 
@@ -54,57 +56,58 @@ Paho 使用 `WebSocketSecureNetworkModule` → `SSLNetworkModule` 处理 WSS：
     china-tower:
       insecure-ssl: true
   ```
-  逻辑：
 
-  1. 构造 TrustManager 实现（空校验）
-  2. SSLContext.getInstance("TLS") → init(null, trustManagers, ...)
-  3. options.setSocketFactory(sslContext.getSocketFactory())
-  4. options.setHttpsHostnameVerificationEnabled(false)
-  5. options.setSSLHostnameVerifier((h, s) -> true)
+逻辑：
 
-  结果：
+1. 构造 TrustManager 实现（空校验）
+2. SSLContext.getInstance("TLS") → init(null, trustManagers, ...)
+3. options.setSocketFactory(sslContext.getSocketFactory())
+4. options.setHttpsHostnameVerificationEnabled(false)
+5. options.setSSLHostnameVerifier((h, s) -> true)
 
-  - 证书链不校验
-  - 主机名不校验
-  - 仍是 TLS 加密通道，但认证失效
+结果：
 
-  ## 5. 风险评估（安全视角）
+- 证书链不校验
+- 主机名不校验
+- 仍是 TLS 加密通道，但认证失效
 
-  关闭校验后：
+## 5. 风险评估
 
-  - MITM 可伪造服务器证书
-  - 凭证泄露风险 ↑
-  - 消息篡改/监听风险 ↑
+关闭校验后：
 
-  适用场景：
+- MITM 可伪造服务器证书
+- 凭证泄露风险 ↑
+- 消息篡改/监听风险 ↑
 
-  - 受控内网
-  - 短期排障
-  - 强监管条件下允许的临时方案
+适用场景：
 
-  ## 6. 连接确认的工程指标
+- 受控内网
+- 短期排障
+- 强监管条件下允许的临时方案
 
-  建议使用“三层确认”：
+## 6. 连接确认的工程指标
 
-  1. connectComplete（连接已建立）
-  2. 订阅成功事件
-  3. 收到测试消息
+建议使用“三层确认”：
 
-  仅有“配置加载/bean started”日志不代表连接成功。
+1. connectComplete（连接已建立）
+2. 订阅成功事件
+3. 收到测试消息
 
-  ## 7. 安全恢复方案（推荐）
+仅有“配置加载/bean started”日志不代表连接成功。
 
-  排障结束后恢复安全校验：
+## 7. 安全恢复方案
 
-  - 用证书匹配的域名访问
-  - 配置正确的 CA 链
-  - 由对方补齐证书链
-  - 确保系统时间正确
+排障结束后恢复安全校验：
 
-  ## 8. 术语对照（技术简表）
+- 用证书匹配的域名访问
+- 配置正确的 CA 链
+- 由对方补齐证书链
+- 确保系统时间正确
 
-  - TLS: Transport Layer Security
-  - SNI: Server Name Indication
-  - SAN: Subject Alternative Name
-  - MITM: Man-In-The-Middle
-  - CONNACK: MQTT 连接确认响应
+## 8. 术语对照
+
+- TLS: Transport Layer Security
+- SNI: Server Name Indication
+- SAN: Subject Alternative Name
+- MITM: Man-In-The-Middle
+- CONNACK: MQTT 连接确认响应

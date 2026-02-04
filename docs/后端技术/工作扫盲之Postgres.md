@@ -6,58 +6,60 @@ permalink: /article/d37f9gvt/
 
 # PostgreSQL入门与PostGIS空间数据库
 
-作为一名主要使用MySQL的开发者，最近我入职了一家需要处理地理空间数据的公司，开始接触PostgreSQL（简称PG）数据库。在使用过程中，我发现PG不仅仅是一个关系型数据库，更是一个功能强大的数据平台，特别是其PostGIS扩展，为地理信息系统(GIS)应用提供了强大支持。
+作为一名主要使用MySQL的开发者，最近我入职了一家需要处理地理空间数据的公司，开始接触PostgreSQL（简称PG）数据库。在使用过程中，我发现PG不仅仅是一个关系型数据库，更是一个功能强大的数据平台，特别是其PostGIS扩展，为地理信息系统(
+GIS)应用提供了强大支持。
 
 ## PostgreSQL vs MySQL：主要区别
 
 在深入了解PostGIS之前，先简单对比一下PostgreSQL和MySQL的主要区别：
 
 1. **架构差异**：
-   - MySQL：4级结构（实例、数据库、表、列）
-   - PostgreSQL：5级结构（实例、数据库、模式Schema、表、列）
+    - MySQL：4级结构（实例、数据库、表、列）
+    - PostgreSQL：5级结构（实例、数据库、模式Schema、表、列）
 
 2. **稳定性与性能**：
-   - PostgreSQL在高并发读写下性能曲线更平稳，负载逼近极限时仍能维持稳定
-   - MySQL在极端写入密集型工作负载方面可能有优势
+    - PostgreSQL在高并发读写下性能曲线更平稳，负载逼近极限时仍能维持稳定
+    - MySQL在极端写入密集型工作负载方面可能有优势
 
 3. **数据类型与扩展性**：
-   - PostgreSQL支持更丰富的数据类型（几何类型、数组、JSON等）
-   - PostgreSQL的扩展系统更为强大，PostGIS就是其中最著名的扩展之一
+    - PostgreSQL支持更丰富的数据类型（几何类型、数组、JSON等）
+    - PostgreSQL的扩展系统更为强大，PostGIS就是其中最著名的扩展之一
 
 4. **事务与ACID支持**：
-   - PostgreSQL在所有配置中都完全兼容ACID
-   - MySQL只有在使用InnoDB和NDB集群存储引擎时才符合ACID标准
+    - PostgreSQL在所有配置中都完全兼容ACID
+    - MySQL只有在使用InnoDB和NDB集群存储引擎时才符合ACID标准
 
 5. **空间数据处理**：
-   - PostgreSQL的PostGIS扩展在GIS领域处于优势地位
-   - MySQL的空间扩展功能相对有限
+    - PostgreSQL的PostGIS扩展在GIS领域处于优势地位
+    - MySQL的空间扩展功能相对有限
 
 ## PostGIS简介
 
-PostGIS是PostgreSQL的一个扩展，为PostgreSQL增加了地理空间数据处理能力。它遵循开放地理空间联盟(OGC)的Simple Features for SQL规范，提供了丰富的地理空间数据类型、函数和索引支持。
+PostGIS是PostgreSQL的一个扩展，为PostgreSQL增加了地理空间数据处理能力。它遵循开放地理空间联盟(OGC)的Simple Features for
+SQL规范，提供了丰富的地理空间数据类型、函数和索引支持。
 
 ### PostGIS的主要特性
 
 1. **丰富的几何数据类型**：
-   - 点(Point)、线(LineString)、多边形(Polygon)
-   - 多点(MultiPoint)、多线(MultiLineString)、多多边形(MultiPolygon)
-   - 几何集合(GeometryCollection)
-   - 3D类型如TIN和多面体表面
+    - 点(Point)、线(LineString)、多边形(Polygon)
+    - 多点(MultiPoint)、多线(MultiLineString)、多多边形(MultiPolygon)
+    - 几何集合(GeometryCollection)
+    - 3D类型如TIN和多面体表面
 
 2. **球面坐标支持**：
-   - 通过geography数据类型支持球面坐标系统
-   - 直接处理经纬度坐标，无需投影转换
+    - 通过geography数据类型支持球面坐标系统
+    - 直接处理经纬度坐标，无需投影转换
 
 3. **栅格数据支持**：
-   - 支持各种像素类型和每个栅格超过1000个波段
-   - 通过postgis_raster扩展提供
+    - 支持各种像素类型和每个栅格超过1000个波段
+    - 通过postgis_raster扩展提供
 
 4. **空间索引**：
-   - 基于GiST(广义搜索树)的R树空间索引
-   - 高效的空间查询性能
+    - 基于GiST(广义搜索树)的R树空间索引
+    - 高效的空间查询性能
 
 5. **拓扑支持**：
-   - 通过postgis_topology扩展提供SQL/MM拓扑支持
+    - 通过postgis_topology扩展提供SQL/MM拓扑支持
 
 ## PostGIS核心函数
 
