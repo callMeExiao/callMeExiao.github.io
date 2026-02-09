@@ -1,3 +1,8 @@
+---
+title: jpa-vs-mybatis-analysis
+createTime: 2026/02/09 12:34:10
+permalink: /article/b8e5hzao/
+---
 # JPA vs MyBatis：一篇讲透选型与落地的实战教程
 
 ## 先说结论

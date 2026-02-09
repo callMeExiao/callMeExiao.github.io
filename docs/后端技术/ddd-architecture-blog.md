@@ -1,3 +1,8 @@
+---
+title: ddd-architecture-blog
+createTime: 2026/02/09 12:34:10
+permalink: /article/n1khzto6/
+---
 # zjdghy-backend 项目 DDD 架构解读（小白友好版）
 
 > 更新时间：2026-02-08  
